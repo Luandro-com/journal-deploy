@@ -1,0 +1,50 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - JWT_SECRET=super-secret-thing
+      - PRISMA_SECRET=super-duber-secret-thing
+      - PRISMA_URL=https://api.revistappc.com
+      - NODE_ENV=production
+      - VIRTUAL_HOST=api.revistappc.com
+      - VIRTUAL_PORT=4000
+      - LETSENCRYPT_HOST=api.revistappc.com
+      - LETSENCRYPT_EMAIL=luandro@gmail.com
+  admin:
+    build: ./admin
+    restart: always
+    volumes:
+      - ./admin:/usr/app
+      - /usr/app/node_modules
+      - /usr/app/.next
+    ports:
+      - "3005:3005"
+    command: "npm start"
+    environment:
+      - API_HOST=https://api.revistappc.com
+      - NODE_ENV=production
+      - VIRTUAL_HOST=admin.revistappc.com
+      - VIRTUAL_PORT=3005
+      - LETSENCRYPT_HOST=admin.revistappc.com
+      - LETSENCRYPT_EMAIL=luandro@gmail.com
+  journal:
+    build: ./journal
+    restart: always
+    volumes:
+      - ./journal:/usr/app
+      - /usr/app/node_modules
+      - /usr/app/.next
+    ports:
+      - "3001:3001"
+    command: "npm start"
+    environment:
+      - API_HOST=https://api.revistappc.com
+      - NODE_ENV=production
+      - VIRTUAL_HOST=periodico2.revistappc.com
+      - VIRTUAL_PORT=3001
+      - LETSENCRYPT_HOST=periodico2.revistappc.com
+      - LETSENCRYPT_EMAIL=luandro@gmail.com

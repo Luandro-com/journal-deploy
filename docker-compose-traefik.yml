@@ -1,0 +1,102 @@
+version: '3'
+
+services:
+  # The reverse proxy service (Traefik)
+  reverse-proxy:
+    image: traefik  # The official Traefik docker image
+    restart: always
+    command: --api --docker  # Enables the web UI and tells Traefik to listen to docker
+    labels:
+      traefik.backend: "traefik"
+      traefik.enable: "true"
+      traefik.frontend.rule: "Host:monitor.ewekombucha.ga"
+    ports:
+      - "80:80"
+      - "8080:8080"  # The Web UI (enabled by --api)
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
+    networks:
+      - web
+    #   - internal
+  prisma:
+    image: prismagraphql/prisma:1.19
+    restart: always
+    ports:
+    - "4466:4466"
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        # uncomment the next line and provide the env var PRISMA_MANAGEMENT_API_SECRET=my-secret to activate cluster security
+        # managementApiSecret: my-secret
+        databases:
+          default:
+            connector: postgres
+            host: postgres
+            port: 5432
+            user: prisma
+            password: prisma
+            migrations: true
+            rawAccess: true
+    networks:
+      - internal
+    labels:
+      traefik.enable: "false"
+  api:
+    image: "node:8-alpine"
+    restart: always
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./admin:/home/node/app
+      - npm-cache:/home/node/.npm
+    ports:
+      - "4000:4000"
+    command: "npm run install-start"
+    labels:
+      traefik.backend: "admin"
+      traefik.docker.network: "web"
+      traefik.enable: "true"
+      traefik.basic.frontend.rule: "Host:admin.ewekombucha.ga"
+      traefik.basic.port: "4000"
+      traefik.basic.protocol: "https"
+    networks:
+      - internal
+      - web
+    depends_on:
+      - prisma
+      - postgres
+  whoami:
+    image: emilevauge/whoami  # A container that exposes an API to show it's IP address
+    ports:
+      - "3012:80"
+    labels:
+      traefik.frontend.rule: "Host:whoami.ewekombucha.ga"
+      traefik.basic.port: "3012"
+      traefik.docker.network: "web"
+      traefik.enable: "true"
+    networks:
+      - web
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    labels:
+      traefik.enable: "false"
+    networks:
+      - internal
+volumes:
+  postgres:
+  npm-cache:
+networks:
+  web:
+    external: true
+  # internal:
