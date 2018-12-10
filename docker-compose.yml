@@ -6,9 +6,9 @@ services:
     ports:
       - "4000:4000"
     environment:
-      - JWT_SECRET=super-secret-thing
-      - PRISMA_SECRET=super-duber-secret-thing
-      - PRISMA_URL=https://api.revistappc.com
+      - JWT_SECRET=jwtsecret123
+      - PRISMA_SECRET=mysecret123
+      - PRISMA_URL=https://us1.prisma.sh/luandro-93a3b2/periodico/dev
       - NODE_ENV=production
       - VIRTUAL_HOST=api.revistappc.com
       - VIRTUAL_PORT=4000
