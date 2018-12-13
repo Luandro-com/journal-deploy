@@ -85,3 +85,8 @@ services:
       - VIRTUAL_PORT=3001
       - LETSENCRYPT_HOST=periodico2.revistappc.com
       - LETSENCRYPT_EMAIL=luandro@gmail.com
+volumes:
+  certs:
+  html:
+  vhostd:
+  postgres:
