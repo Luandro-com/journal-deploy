@@ -81,11 +81,11 @@ services:
     environment:
       - API_HOST=https://api.revistappc.com
       - NODE_ENV=production
-      - VIRTUAL_HOST=periodico2.revistappc.com
+      - VIRTUAL_HOST=revistappc.com
       - VIRTUAL_PORT=3001
-      - LETSENCRYPT_HOST=periodico2.revistappc.com
+      - LETSENCRYPT_HOST=revistappc.com
       - LETSENCRYPT_EMAIL=luandro@gmail.com
-volumes:
+volumes: 
   certs:
   html:
   vhostd:
