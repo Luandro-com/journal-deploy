@@ -50,3 +50,7 @@ services:
       - LETSENCRYPT_EMAIL=luandro@gmail.com
 volumes: 
   postgres:
+networks:
+  nginx-proxy:
+    external:
+      name: nginx-proxy
